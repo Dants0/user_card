@@ -1,94 +1,93 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+
+import "./global.css";
+
+import styles from "./styles.module.scss";
+import { useState } from "react";
+import axios from "axios";
+import dayjs from "dayjs";
+import { options } from "@/config/optionsAPI";
+import { translateText } from "@/utils/translate";
+
+interface User {
+  name: { first: string; last: string };
+  email: string;
+  birthday: Date;
+  address: string;
+  phone: string;
+  password: string;
+  picture: { large: string; thumbnail: string };
+  dob: { date: Date; age: string };
+  location: { country: string; city: string; state: string };
+}
+
+interface Quote {
+  value: string;
+}
 
 export default function Home() {
+  const [users, setUsers] = useState<User>();
+  const [quote, setQuote] = useState<Quote>();
+
+  async function getUser() {
+    await getQuote();
+    await axios
+      .get("https://randomuser.me/api/?nat=br")
+      .then((response) => {
+        const data = response.data;
+        setUsers(data.results[0]);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  async function getQuote() {
+    const responseQuote = await axios.request(options);
+    const quoteData = responseQuote.data;
+    console.log(quoteData);
+    setQuote({ value: quoteData.value });
+  }
+
+  async function getQuoteTranslated() {
+    const translatedText = await translateText(quote?.value);
+    setQuote({ value: translatedText.translatedText });
+  }
+
+  const birthDay = users
+    ? dayjs(Object.values(users.dob)[0]).format("DD/MM/YYYY")
+    : "";
+
   return (
     <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
+      {users ? (
+        <div className={styles.containerCards}>
+          <div className={styles.boxInfoUser}>
+            <img
+              src={users.picture ? users.picture.large : ""}
+              alt="User Photo"
             />
-          </a>
+            <h1>{users.name.first + " " + users.name.last}</h1>
+            <p className={styles.age}>{users.dob.age} anos</p>
+          </div>
+          <div className={styles.boxQuote}>
+            <p>"{quote?.value}"</p>
+            <p>Chuck Norris</p>
+          </div>
+          <p className={styles.email}>{users.email}</p>
+          <p>{birthDay}</p>
+          <p>Brasil 🇧🇷</p>
         </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+      ) : (
+        ""
+      )}
+      <div className={styles.containerButtons}>
+        <button onClick={getUser} className={styles.translateButton}>
+          Random User
+        </button>
+        <button onClick={getQuoteTranslated} className={styles.translateButton}>
+          Translate Phrase
+        </button>
       </div>
     </main>
   );
