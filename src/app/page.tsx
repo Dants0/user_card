@@ -8,6 +8,7 @@ import axios from "axios";
 import dayjs from "dayjs";
 import { options } from "@/config/optionsAPI";
 import { translateText } from "@/utils/translate";
+import Image from "next/image";
 
 interface User {
   name: { first: string; last: string };
@@ -63,9 +64,11 @@ export default function Home() {
       {users ? (
         <div className={styles.containerCards}>
           <div className={styles.boxInfoUser}>
-            <img
+            <Image
               src={users.picture ? users.picture.large : ""}
               alt="User Photo"
+              width={300}
+              height={300}
             />
             <h1>{users.name.first + " " + users.name.last}</h1>
             <p className={styles.age}>{users.dob.age} anos</p>
