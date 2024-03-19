@@ -74,7 +74,7 @@ export default function Home() {
             <p className={styles.age}>{users.dob.age} anos</p>
           </div>
           <div className={styles.boxQuote}>
-            <p>"{quote?.value}"</p>
+            <p><strong>{quote?.value}</strong></p>
             <p>Chuck Norris</p>
           </div>
           <p className={styles.email}>{users.email}</p>
