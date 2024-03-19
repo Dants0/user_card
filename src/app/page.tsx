@@ -46,7 +46,6 @@ export default function Home() {
   async function getQuote() {
     const responseQuote = await axios.request(options);
     const quoteData = responseQuote.data;
-    console.log(quoteData);
     setQuote({ value: quoteData.value });
   }
 

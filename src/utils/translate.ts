@@ -1,7 +1,5 @@
 import axios from "axios";
 
-console.log(process.env.QUOTES_API_KEY)
-
 export async function translateText(text: string | undefined) {
   const encodedParams = new URLSearchParams();
   encodedParams.set("source_language", "en");
